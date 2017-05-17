@@ -1,0 +1,418 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A13CEFA41ECBD4120037AAC3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13CEFA31ECBD4120037AAC3 /* AppDelegate.swift */; };
+		A13CEFA61ECBD4120037AAC3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13CEFA51ECBD4120037AAC3 /* ViewController.swift */; };
+		A13CEFA81ECBD4120037AAC3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A13CEFA71ECBD4120037AAC3 /* Assets.xcassets */; };
+		A13CEFAB1ECBD4120037AAC3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A13CEFA91ECBD4120037AAC3 /* Main.storyboard */; };
+		A13CEFB61ECBD4130037AAC3 /* ChefInspectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13CEFB51ECBD4130037AAC3 /* ChefInspectorTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A13CEFB21ECBD4130037AAC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A13CEF981ECBD4120037AAC3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A13CEF9F1ECBD4120037AAC3;
+			remoteInfo = ChefInspector;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A13CEFA01ECBD4120037AAC3 /* ChefInspector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChefInspector.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A13CEFA31ECBD4120037AAC3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A13CEFA51ECBD4120037AAC3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		A13CEFA71ECBD4120037AAC3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A13CEFAA1ECBD4120037AAC3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A13CEFAC1ECBD4120037AAC3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A13CEFB11ECBD4130037AAC3 /* ChefInspectorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChefInspectorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A13CEFB51ECBD4130037AAC3 /* ChefInspectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChefInspectorTests.swift; sourceTree = "<group>"; };
+		A13CEFB71ECBD4130037AAC3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A13CEF9D1ECBD4120037AAC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A13CEFAE1ECBD4130037AAC3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A13CEF971ECBD4120037AAC3 = {
+			isa = PBXGroup;
+			children = (
+				A13CEFA21ECBD4120037AAC3 /* ChefInspector */,
+				A13CEFB41ECBD4130037AAC3 /* ChefInspectorTests */,
+				A13CEFA11ECBD4120037AAC3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A13CEFA11ECBD4120037AAC3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A13CEFA01ECBD4120037AAC3 /* ChefInspector.app */,
+				A13CEFB11ECBD4130037AAC3 /* ChefInspectorTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A13CEFA21ECBD4120037AAC3 /* ChefInspector */ = {
+			isa = PBXGroup;
+			children = (
+				A13CEFA31ECBD4120037AAC3 /* AppDelegate.swift */,
+				A13CEFA51ECBD4120037AAC3 /* ViewController.swift */,
+				A13CEFA71ECBD4120037AAC3 /* Assets.xcassets */,
+				A13CEFA91ECBD4120037AAC3 /* Main.storyboard */,
+				A13CEFAC1ECBD4120037AAC3 /* Info.plist */,
+			);
+			path = ChefInspector;
+			sourceTree = "<group>";
+		};
+		A13CEFB41ECBD4130037AAC3 /* ChefInspectorTests */ = {
+			isa = PBXGroup;
+			children = (
+				A13CEFB51ECBD4130037AAC3 /* ChefInspectorTests.swift */,
+				A13CEFB71ECBD4130037AAC3 /* Info.plist */,
+			);
+			path = ChefInspectorTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A13CEF9F1ECBD4120037AAC3 /* ChefInspector */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A13CEFBA1ECBD4130037AAC3 /* Build configuration list for PBXNativeTarget "ChefInspector" */;
+			buildPhases = (
+				A13CEF9C1ECBD4120037AAC3 /* Sources */,
+				A13CEF9D1ECBD4120037AAC3 /* Frameworks */,
+				A13CEF9E1ECBD4120037AAC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChefInspector;
+			productName = ChefInspector;
+			productReference = A13CEFA01ECBD4120037AAC3 /* ChefInspector.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A13CEFB01ECBD4130037AAC3 /* ChefInspectorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A13CEFBD1ECBD4130037AAC3 /* Build configuration list for PBXNativeTarget "ChefInspectorTests" */;
+			buildPhases = (
+				A13CEFAD1ECBD4130037AAC3 /* Sources */,
+				A13CEFAE1ECBD4130037AAC3 /* Frameworks */,
+				A13CEFAF1ECBD4130037AAC3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A13CEFB31ECBD4130037AAC3 /* PBXTargetDependency */,
+			);
+			name = ChefInspectorTests;
+			productName = ChefInspectorTests;
+			productReference = A13CEFB11ECBD4130037AAC3 /* ChefInspectorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A13CEF981ECBD4120037AAC3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0830;
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Joe Smith";
+				TargetAttributes = {
+					A13CEF9F1ECBD4120037AAC3 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = CT28RVZN2N;
+						ProvisioningStyle = Automatic;
+					};
+					A13CEFB01ECBD4130037AAC3 = {
+						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = CT28RVZN2N;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A13CEF9F1ECBD4120037AAC3;
+					};
+				};
+			};
+			buildConfigurationList = A13CEF9B1ECBD4120037AAC3 /* Build configuration list for PBXProject "ChefInspector" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A13CEF971ECBD4120037AAC3;
+			productRefGroup = A13CEFA11ECBD4120037AAC3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A13CEF9F1ECBD4120037AAC3 /* ChefInspector */,
+				A13CEFB01ECBD4130037AAC3 /* ChefInspectorTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A13CEF9E1ECBD4120037AAC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A13CEFA81ECBD4120037AAC3 /* Assets.xcassets in Resources */,
+				A13CEFAB1ECBD4120037AAC3 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A13CEFAF1ECBD4130037AAC3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A13CEF9C1ECBD4120037AAC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A13CEFA61ECBD4120037AAC3 /* ViewController.swift in Sources */,
+				A13CEFA41ECBD4120037AAC3 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A13CEFAD1ECBD4130037AAC3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A13CEFB61ECBD4130037AAC3 /* ChefInspectorTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A13CEFB31ECBD4130037AAC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A13CEF9F1ECBD4120037AAC3 /* ChefInspector */;
+			targetProxy = A13CEFB21ECBD4130037AAC3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A13CEFA91ECBD4120037AAC3 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A13CEFAA1ECBD4120037AAC3 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A13CEFB81ECBD4130037AAC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A13CEFB91ECBD4130037AAC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+			};
+			name = Release;
+		};
+		A13CEFBB1ECBD4130037AAC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = CT28RVZN2N;
+				INFOPLIST_FILE = ChefInspector/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.bjoli.ChefInspector;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		A13CEFBC1ECBD4130037AAC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = CT28RVZN2N;
+				INFOPLIST_FILE = ChefInspector/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.bjoli.ChefInspector;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		A13CEFBE1ECBD4130037AAC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = CT28RVZN2N;
+				INFOPLIST_FILE = ChefInspectorTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.bjoli.ChefInspectorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ChefInspector.app/Contents/MacOS/ChefInspector";
+			};
+			name = Debug;
+		};
+		A13CEFBF1ECBD4130037AAC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = CT28RVZN2N;
+				INFOPLIST_FILE = ChefInspectorTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.bjoli.ChefInspectorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ChefInspector.app/Contents/MacOS/ChefInspector";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A13CEF9B1ECBD4120037AAC3 /* Build configuration list for PBXProject "ChefInspector" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A13CEFB81ECBD4130037AAC3 /* Debug */,
+				A13CEFB91ECBD4130037AAC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A13CEFBA1ECBD4130037AAC3 /* Build configuration list for PBXNativeTarget "ChefInspector" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A13CEFBB1ECBD4130037AAC3 /* Debug */,
+				A13CEFBC1ECBD4130037AAC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		A13CEFBD1ECBD4130037AAC3 /* Build configuration list for PBXNativeTarget "ChefInspectorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A13CEFBE1ECBD4130037AAC3 /* Debug */,
+				A13CEFBF1ECBD4130037AAC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A13CEF981ECBD4120037AAC3 /* Project object */;
+}
