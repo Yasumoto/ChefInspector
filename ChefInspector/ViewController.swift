@@ -9,6 +9,8 @@
 import Cocoa
 
 class ViewController: NSViewController {
+    @IBOutlet weak var hostnameTableCellView: NSTableCellView!
+    @IBOutlet var attributesTextView: NSTextView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +24,13 @@ class ViewController: NSViewController {
         }
     }
 
+    @IBAction func clearView(_ sender: NSButton) {
+    }
 
+    @IBAction func searchHostAttributes(_ sender: NSSearchField) {
+    }
+
+    @IBAction func viewHostAttributes(_ sender: NSTextField) {
+    }
 }
 
