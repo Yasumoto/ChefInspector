@@ -15,27 +15,35 @@ class ViewController: NSViewController {
     @IBOutlet var attributesTextView: NSTextView!
     let chefClient = GyutouClient()
 
-    var hostnames = [String]()
+    var allHostnames = [String]()
+    var viewableHostnames = [String]()
     var hostOutput = [String]()
+    var attributes = [String:String]()
 
     func updateHostList() {
         do {
             if let nodes = try chefClient.nodeList() {
                 print("Found \(nodes.count) chef nodes")
-                hostnames = nodes.sorted()
+                allHostnames = nodes.sorted()
+                viewableHostnames = allHostnames
             } else {
                 print("Did not retrieve any nodes")
-                hostnames = [String]()
+                allHostnames = [String]()
             }
         } catch {
-                print("Error when populating node list: \(error)")
+            print("Error when populating node list: \(error)")
         }
     }
 
     func displayHostAttributes(hostname: String) {
         do {
-            if let output = try chefClient.retrieveNodeAttributes(nodeName: hostname) {
-                self.attributesTextView.textStorage?.mutableString.setString("\(output)")
+            if self.attributes.index(forKey: hostname) != nil {
+                self.attributesTextView.textStorage?.mutableString.setString("\(self.attributes[hostname]!)")
+            } else {
+                if let output = try chefClient.retrieveNodeAttributes(nodeName: hostname) {
+                    self.attributes[hostname] = "\(output)"
+                    self.attributesTextView.textStorage?.mutableString.setString("\(output)")
+                }
             }
         } catch {
             print("Warning! Failed to get node attributes:\n\(error)")
@@ -60,17 +68,23 @@ class ViewController: NSViewController {
         self.attributesTextView.textStorage?.mutableString.setString("")
         self.hostOutput = [String]()
         updateHostList()
+        self.attributes = [String: String]()
     }
 
     @IBAction func filterHostAttribute(_ sender: NSSearchField) {
     }
 
     @IBAction func hostnameSelected(_ sender: NSTableView) {
-        displayHostAttributes(hostname: hostnames[sender.selectedRow])
+        displayHostAttributes(hostname: viewableHostnames[sender.selectedRow])
     }
 
     @IBAction func searchHostAttributes(_ sender: NSSearchField) {
-        displayHostAttributes(hostname: sender.stringValue)
+        if sender.stringValue == "" {
+            viewableHostnames = allHostnames
+        } else {
+            viewableHostnames = allHostnames.filter { $0.contains(sender.stringValue) }
+        }
+        hostnameTableView.reloadData()
     }
 
     @IBAction func viewHostAttributes(_ sender: NSTextField) {
@@ -80,8 +94,7 @@ class ViewController: NSViewController {
 
 extension ViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        print(hostnames.count)
-        return hostnames.count
+        return viewableHostnames.count
     }
 }
 
@@ -93,8 +106,10 @@ extension ViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let cell = tableView.make(withIdentifier: CellIdentifiers.HostNameCell, owner: nil) as? NSTableCellView {
-            cell.textField?.stringValue = hostnames[row]
-            return cell
+            if row < viewableHostnames.count {
+                cell.textField?.stringValue = viewableHostnames[row]
+                return cell
+            }
         } else {
             print("Couldn't make cell")
         }
