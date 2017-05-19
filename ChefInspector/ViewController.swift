@@ -36,6 +36,7 @@ class ViewController: NSViewController {
     }
 
     func displayHostAttributes(hostname: String) {
+        //TODO(jmsmith): Next up is to use https://www.raywenderlich.com/123463/nsoutlineview-macos-tutorial for better display
         do {
             if self.attributes.index(forKey: hostname) != nil {
                 self.attributesTextView.textStorage?.mutableString.setString("\(self.attributes[hostname]!)")
