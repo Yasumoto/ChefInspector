@@ -103,7 +103,7 @@ class ViewController: NSViewController {
                 self.viewableHostnames = self.allHostnames
             } else if sender.stringValue.contains(":") {
                 do {
-                    self.viewableHostnames = try self.chefClient.searchNode(query: sender.stringValue)
+                    self.viewableHostnames = try self.chefClient.searchNode(query: sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!)
                 } catch {
                     print("Error searching chef: \(error)")
                     self.viewableHostnames = []
