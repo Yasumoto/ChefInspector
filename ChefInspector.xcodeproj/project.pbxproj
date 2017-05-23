@@ -437,6 +437,7 @@
 				A13CEFBC1ECBD4130037AAC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A13CEFBD1ECBD4130037AAC3 /* Build configuration list for PBXNativeTarget "ChefInspectorTests" */ = {
 			isa = XCConfigurationList;
@@ -445,6 +446,7 @@
 				A13CEFBF1ECBD4130037AAC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
