@@ -49,17 +49,21 @@ class ViewController: NSViewController {
 
     func displayHostAttributes(hostname: String) {
         //TODO(jmsmith): Next up is to use https://www.raywenderlich.com/123463/nsoutlineview-macos-tutorial for better display
-        do {
-            if self.attributes.index(forKey: hostname) != nil {
-                self.attributesTextView.textStorage?.mutableString.setString("\(self.attributes[hostname]!)")
-            } else {
-                if let output = try chefClient.retrieveNodeAttributes(nodeName: hostname) {
-                    self.attributes[hostname] = "\(output)"
-                    self.attributesTextView.textStorage?.mutableString.setString("\(output)")
+        if self.attributes.index(forKey: hostname) != nil {
+            self.attributesTextView.textStorage?.mutableString.setString("\(self.attributes[hostname]!)")
+        } else {
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    if let output = try self.chefClient.retrieveNodeAttributes(nodeName: hostname) {
+                        self.attributes[hostname] = "\(output)"
+                        DispatchQueue.main.async {
+                            self.attributesTextView.textStorage?.mutableString.setString("\(output)")
+                        }
+                    }
+                } catch {
+                    print("Warning! Failed to get node attributes for \(hostname):\n\(error)")
                 }
             }
-        } catch {
-            print("Warning! Failed to get node attributes:\n\(error)")
         }
     }
 
@@ -97,7 +101,7 @@ class ViewController: NSViewController {
         DispatchQueue.global(qos: .userInitiated).async {
             if sender.stringValue == "" {
                 self.viewableHostnames = self.allHostnames
-            } else if sender.stringValue.contains("role:") {
+            } else if sender.stringValue.contains(":") {
                 do {
                     self.viewableHostnames = try self.chefClient.searchNode(query: sender.stringValue)
                 } catch {
