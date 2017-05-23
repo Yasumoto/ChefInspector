@@ -20,6 +20,18 @@ class ViewController: NSViewController {
     var hostOutput = [String]()
     var attributes = [String:String]()
 
+    func copy(sender: AnyObject?){
+        var textToDisplayInPasteboard = ""
+        let indexSet = hostnameTableView.selectedRowIndexes
+        for (_, rowIndex) in indexSet.enumerated() {
+            textToDisplayInPasteboard.append("\(viewableHostnames[rowIndex])\n")
+        }
+        let pasteBoard = NSPasteboard.general()
+        pasteBoard.clearContents()
+
+        pasteBoard.setString(textToDisplayInPasteboard, forType:NSPasteboardTypeString)
+    }
+
     func updateHostList() {
         do {
             if let nodes = try chefClient.nodeList() {
@@ -80,15 +92,25 @@ class ViewController: NSViewController {
     }
 
     @IBAction func searchHostAttributes(_ sender: NSSearchField) {
-        if sender.stringValue == "" {
-            viewableHostnames = allHostnames
-        } else {
-            viewableHostnames = allHostnames.filter { $0.contains(sender.stringValue) }
+        self.viewableHostnames = ["Searching..."]
+        self.hostnameTableView.reloadData()
+        DispatchQueue.global(qos: .userInitiated).async {
+            if sender.stringValue == "" {
+                self.viewableHostnames = self.allHostnames
+            } else if sender.stringValue.contains("role:") {
+                do {
+                    self.viewableHostnames = try self.chefClient.searchNode(query: sender.stringValue)
+                } catch {
+                    print("Error searching chef: \(error)")
+                    self.viewableHostnames = []
+                }
+            } else {
+                self.viewableHostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }
+            }
+            DispatchQueue.main.async {
+                self.hostnameTableView.reloadData()
+            }
         }
-        hostnameTableView.reloadData()
-    }
-
-    @IBAction func viewHostAttributes(_ sender: NSTextField) {
     }
 }
 
