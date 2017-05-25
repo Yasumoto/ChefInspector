@@ -19,44 +19,50 @@ class ViewController: NSViewController {
     var viewableHostnames = [String]()
     var hostOutput = [String]()
     var attributes = [String:String]()
-
-    func copy(sender: AnyObject?){
-        var textToDisplayInPasteboard = ""
-        let indexSet = hostnameTableView.selectedRowIndexes
-        for (_, rowIndex) in indexSet.enumerated() {
-            textToDisplayInPasteboard.append("\(viewableHostnames[rowIndex])\n")
-        }
-        let pasteBoard = NSPasteboard.general()
-        pasteBoard.clearContents()
-
-        pasteBoard.setString(textToDisplayInPasteboard, forType:NSPasteboardTypeString)
-    }
+    let hostQueue = DispatchQueue(label: "viewableHostsQueue")
+    let chefQueue = DispatchQueue(label: "chefQueue")
 
     func updateHostList() {
-        do {
-            if let nodes = try chefClient.nodeList() {
-                print("Found \(nodes.count) chef nodes")
-                allHostnames = nodes.sorted()
-                viewableHostnames = allHostnames
-            } else {
-                print("Did not retrieve any nodes")
-                allHostnames = [String]()
+        hostQueue.sync {
+            viewableHostnames = ["Updating host list..."]
+        }
+        self.hostnameTableView.reloadData()
+        self.chefQueue.async {
+            do {
+                print("Populating Chef Nodes")
+                if let nodes = try self.chefClient.nodeList() {
+                    print("Found \(nodes.count) chef nodes")
+                    self.hostQueue.sync(flags: .barrier) {
+                        self.allHostnames = nodes.sorted()
+                        self.viewableHostnames = self.allHostnames
+                        DispatchQueue.main.async {
+                            print("Reloading node list after populating from chef")
+                            self.hostnameTableView.reloadData()
+                        }
+                    }
+                } else {
+                    print("Did not retrieve any nodes")
+                    self.allHostnames = [String]()
+                }
+            } catch {
+                print("Error when populating node list: \(error)")
             }
-        } catch {
-            print("Error when populating node list: \(error)")
         }
     }
 
     func displayHostAttributes(hostname: String) {
         //TODO(jmsmith): Next up is to use https://www.raywenderlich.com/123463/nsoutlineview-macos-tutorial for better display
         if self.attributes.index(forKey: hostname) != nil {
+            print("Attributes for \(hostname) already found in cache")
             self.attributesTextView.textStorage?.mutableString.setString("\(self.attributes[hostname]!)")
         } else {
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
+                    print("Querying chef for attributes for \(hostname)")
                     if let output = try self.chefClient.retrieveNodeAttributes(nodeName: hostname) {
                         self.attributes[hostname] = "\(output)"
                         DispatchQueue.main.async {
+                            print("Updating attributes view to display \(hostname)")
                             self.attributesTextView.textStorage?.mutableString.setString("\(output)")
                         }
                     }
@@ -92,26 +98,53 @@ class ViewController: NSViewController {
     }
 
     @IBAction func hostnameSelected(_ sender: NSTableView) {
-        displayHostAttributes(hostname: viewableHostnames[sender.selectedRow])
+        var hostname: String = ""
+        hostQueue.sync() {
+            if sender.selectedRow < viewableHostnames.count && sender.selectedRow >= 0 {
+                hostname = viewableHostnames[sender.selectedRow]
+            }
+        }
+        if hostname != "" {
+            displayHostAttributes(hostname: hostname)
+        }
     }
 
     @IBAction func searchHostAttributes(_ sender: NSSearchField) {
-        self.viewableHostnames = ["Searching..."]
+        self.hostQueue.sync(flags: .barrier) {
+            print("Temporarily updating hostlist")
+            self.viewableHostnames = ["Searching..."]
+        }
+        print("Reloading tableview data")
         self.hostnameTableView.reloadData()
-        DispatchQueue.global(qos: .userInitiated).async {
+        chefQueue.async {
             if sender.stringValue == "" {
+                print("Resetting tableview to all hostnames")
                 self.viewableHostnames = self.allHostnames
             } else if sender.stringValue.contains(":") {
-                do {
-                    self.viewableHostnames = try self.chefClient.searchNode(query: sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!)
-                } catch {
-                    print("Error searching chef: \(error)")
-                    self.viewableHostnames = []
-                }
+                    do {
+                        print("Performing chef search for \(sender.stringValue)")
+                        let searchedHostnames = try self.chefClient.searchNode(query: sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!).sorted()
+                        self.hostQueue.sync(flags: .barrier) {
+                            self.viewableHostnames = searchedHostnames
+                        }
+
+                    } catch {
+                        print("Error searching chef: \(error)")
+                        self.viewableHostnames = []
+                    }
             } else {
-                self.viewableHostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }
+                self.hostQueue.sync(flags: .barrier) {
+                    print("Taking a look at filtering current hostnames")
+                    let hostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }.sorted()
+                    if hostnames.count < 1 {
+                        self.viewableHostnames = [""]
+                    } else {
+                        self.viewableHostnames = hostnames
+                    }
+                }
             }
             DispatchQueue.main.async {
+                print("Reloading data after searching for a hostname")
                 self.hostnameTableView.reloadData()
             }
         }
@@ -121,7 +154,10 @@ class ViewController: NSViewController {
 
 extension ViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return viewableHostnames.count
+        return hostQueue.sync {
+            print("There are \(viewableHostnames.count) rows")
+            return viewableHostnames.count
+        }
     }
 }
 
@@ -132,10 +168,14 @@ extension ViewController: NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let cell = tableView.make(withIdentifier: CellIdentifiers.HostNameCell, owner: nil) as? NSTableCellView {
-            if row < viewableHostnames.count {
-                cell.textField?.stringValue = viewableHostnames[row]
-                return cell
+        if let cell = tableView.make(withIdentifier: CellIdentifiers.HostNameCell, owner: self) as? NSTableCellView {
+            return hostQueue.sync() {
+                if row < viewableHostnames.count {
+                    cell.textField?.stringValue = viewableHostnames[row]
+                    return cell
+                }
+                print("Row \(row) larger than index of \(viewableHostnames.count)")
+                return nil
             }
         } else {
             print("Couldn't make cell")
