@@ -54,7 +54,11 @@ class ViewController: NSViewController {
         //TODO(jmsmith): Next up is to use https://www.raywenderlich.com/123463/nsoutlineview-macos-tutorial for better display
         if self.attributes.index(forKey: hostname) != nil {
             print("Attributes for \(hostname) already found in cache")
-            self.attributesTextView.textStorage?.mutableString.setString("\(self.attributes[hostname]!)")
+            if let value = self.attributes[hostname] {
+                self.attributesTextView.textStorage?.mutableString.setString("\(value)")
+            } else {
+                self.attributesTextView.textStorage?.mutableString.setString("Node not found in Chef.")
+            }
         } else {
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
@@ -122,10 +126,13 @@ class ViewController: NSViewController {
                 self.viewableHostnames = self.allHostnames
             } else if sender.stringValue.contains(":") {
                     do {
-                        print("Performing chef search for \(sender.stringValue)")
-                        let searchedHostnames = try self.chefClient.searchNode(query: sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!).sorted()
-                        self.hostQueue.sync(flags: .barrier) {
-                            self.viewableHostnames = searchedHostnames
+                        if let searchQuery = sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
+                            print("Performing chef search for \(searchQuery)")
+
+                            let searchedHostnames = try self.chefClient.searchNode(query: searchQuery).sorted()
+                            self.hostQueue.sync(flags: .barrier) {
+                                self.viewableHostnames = searchedHostnames
+                            }
                         }
 
                     } catch {
@@ -143,7 +150,7 @@ class ViewController: NSViewController {
                     }
                 }
             }
-            DispatchQueue.main.async {
+            DispatchQueue.main.sync {
                 print("Reloading data after searching for a hostname")
                 self.hostnameTableView.reloadData()
             }
