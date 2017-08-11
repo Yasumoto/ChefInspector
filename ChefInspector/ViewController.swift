@@ -175,7 +175,7 @@ extension ViewController: NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let cell = tableView.make(withIdentifier: CellIdentifiers.HostNameCell, owner: self) as? NSTableCellView {
+        if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: CellIdentifiers.HostNameCell), owner: self) as? NSTableCellView {
             return hostQueue.sync() {
                 if row < viewableHostnames.count {
                     cell.textField?.stringValue = viewableHostnames[row]
