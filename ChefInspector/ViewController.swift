@@ -120,44 +120,45 @@ class ViewController: NSViewController {
         }
         print("Reloading tableview data")
         self.hostnameTableView.reloadData()
-        chefQueue.async {
-            if sender.stringValue == "" {
+        if sender.stringValue == "" {
+            chefQueue.async {
                 print("Resetting tableview to all hostnames")
                 self.viewableHostnames = self.allHostnames
-            } else if sender.stringValue.contains(":") {
-                    do {
-                        if let searchQuery = sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-                            print("Performing chef search for \(searchQuery)")
+            }
+        } else if sender.stringValue.contains(":") {
+            chefQueue.async {
+                do {
+                    if let searchQuery = sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
+                        print("Performing chef search for \(searchQuery)")
 
-                            let searchedHostnames = try self.chefClient.searchNode(query: searchQuery).sorted()
-                            self.hostQueue.sync(flags: .barrier) {
-                                self.viewableHostnames = searchedHostnames
-                            }
+                        let searchedHostnames = try self.chefClient.searchNode(query: searchQuery).sorted()
+                        self.hostQueue.sync(flags: .barrier) {
+                            self.viewableHostnames = searchedHostnames
                         }
+                    }
 
-                    } catch {
-                        print("Error searching chef: \(error)")
-                        self.viewableHostnames = []
-                    }
-            } else {
-                self.hostQueue.sync(flags: .barrier) {
-                    print("Taking a look at filtering current hostnames")
-                    let hostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }.sorted()
-                    if hostnames.count < 1 {
-                        self.viewableHostnames = [""]
-                    } else {
-                        self.viewableHostnames = hostnames
-                    }
+                } catch {
+                    print("Error searching chef: \(error)")
+                    self.viewableHostnames = []
                 }
             }
-            DispatchQueue.main.sync {
-                print("Reloading data after searching for a hostname")
-                self.hostnameTableView.reloadData()
+        } else {
+            self.hostQueue.sync(flags: .barrier) {
+                print("Taking a look at filtering current hostnames")
+                let hostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }.sorted()
+                if hostnames.count < 1 {
+                    self.viewableHostnames = [""]
+                } else {
+                    self.viewableHostnames = hostnames
+                }
             }
+        }
+        DispatchQueue.main.async {
+            print("Reloading data after searching for a hostname")
+            self.hostnameTableView.reloadData()
         }
     }
 }
-
 
 extension ViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
