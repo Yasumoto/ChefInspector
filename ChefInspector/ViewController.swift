@@ -13,7 +13,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var hostnameTableView: NSTableView!
 
     @IBOutlet var attributesTextView: NSTextView!
-    let chefClient = GyutouClient()
+    let chefClient = try! GyutouClient()
 
     var allHostnames = [String]()
     var viewableHostnames = [String]()

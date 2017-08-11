@@ -1,1 +1,2 @@
-github "Yasumoto/Gyutou" "master"
+# github "Yasumoto/Gyutou" "master"
+git "file:///Users/jmsmith/workspace/Baseline/Gyutou" "swift4"
