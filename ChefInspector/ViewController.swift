@@ -12,13 +12,13 @@ import Gyutou
 class ViewController: NSViewController {
     @IBOutlet weak var hostnameTableView: NSTableView!
 
-    @IBOutlet var attributesTextView: NSTextView!
+    @IBOutlet weak var attributesOutlineView: NSOutlineView!
     let chefClient = try! GyutouClient()
 
     var allHostnames = [String]()
     var viewableHostnames = [String]()
-    var hostOutput = [String]()
-    var attributes = [String:String]()
+    var hostOutput = [String:Any]()
+    var attributes = [String:Any]()
     let hostQueue = DispatchQueue(label: "viewableHostsQueue")
     let chefQueue = DispatchQueue(label: "chefQueue")
 
@@ -54,20 +54,27 @@ class ViewController: NSViewController {
         //TODO(jmsmith): Next up is to use https://www.raywenderlich.com/123463/nsoutlineview-macos-tutorial for better display
         if self.attributes.index(forKey: hostname) != nil {
             print("Attributes for \(hostname) already found in cache")
-            if let value = self.attributes[hostname] {
-                self.attributesTextView.textStorage?.mutableString.setString("\(value)")
+            if let value = self.attributes[hostname] as? [String: Any] {
+                self.hostOutput = value
             } else {
-                self.attributesTextView.textStorage?.mutableString.setString("Node not found in Chef.")
+                self.hostOutput = ["Could not read hostname in cache": ""]
             }
+            self.attributesOutlineView.setNeedsDisplay()
         } else {
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
                     print("Querying chef for attributes for \(hostname)")
                     if let output = try self.chefClient.retrieveNodeAttributes(nodeName: hostname) {
-                        self.attributes[hostname] = "\(output)"
+                        self.attributes[hostname] = output
                         DispatchQueue.main.async {
                             print("Updating attributes view to display \(hostname)")
-                            self.attributesTextView.textStorage?.mutableString.setString("\(output)")
+                            if let formattedOutput = output as? [String:Any] {
+                                self.hostOutput = formattedOutput
+                            } else {
+                                print("Problem parsing \(output)")
+                                self.hostOutput = [String:Any]()
+                            }
+                            self.attributesOutlineView.setNeedsDisplay()
                         }
                     }
                 } catch {
@@ -83,6 +90,8 @@ class ViewController: NSViewController {
         updateHostList()
         hostnameTableView.delegate = self
         hostnameTableView.dataSource = self
+        attributesOutlineView.delegate = self
+        attributesOutlineView.dataSource = self
     }
 
     override var representedObject: Any? {
@@ -92,10 +101,11 @@ class ViewController: NSViewController {
     }
 
     @IBAction func clearView(_ sender: NSButton) {
-        self.attributesTextView.textStorage?.mutableString.setString("")
-        self.hostOutput = [String]()
+        //TODO
+        //self.attributesOutlineView = empty or something
+        self.hostOutput = [String:Any]()
         updateHostList()
-        self.attributes = [String: String]()
+        self.attributes = [String: Any]()
     }
 
     @IBAction func filterHostAttribute(_ sender: NSSearchField) {
@@ -190,5 +200,59 @@ extension ViewController: NSTableViewDelegate {
         }
         return nil
     }
-    
+}
+
+extension ViewController: NSOutlineViewDataSource {
+    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+        print("Counting children")
+        if let section = item as? [String: Any] {
+            return section.count
+        } else if let leaf = item as? [Any] {
+            return leaf.count
+        }
+        print("Not a leaf or section so assuming end")
+        return 1
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+        print("Getting item for outline")
+        if let section = item as? [String: Any] {
+            return Array(section)[index].value
+        } else if let leaf = item as? [Any] {
+            return leaf[index]
+        } else if let attribute = item as? String {
+            return attribute
+        }
+        return ""
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
+        print("Checking if outline is expandable")
+        if let section = item as? [String: Any] {
+            //TODO this is not right- i want the children of section, right?
+            return section.count > 1
+        } else if let leaf = item as? [Any] {
+            return leaf.count > 1
+        }
+        return false
+    }
+}
+
+extension ViewController: NSOutlineViewDelegate {
+    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+        print("Generating outline view")
+        var view: NSTableCellView?
+        var attribute = ""
+        if let attempt = item as? [String:Any] {
+            attribute = Array(attempt)[0].key
+        } else if let leaf = item as? [Any] {
+            attribute = "\(leaf[0])"
+        }
+        view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "AttributeCell"), owner: self) as? NSTableCellView
+        if let textField = view?.textField {
+            textField.stringValue = attribute
+            textField.sizeToFit()
+        }
+        return view
+    }
 }
