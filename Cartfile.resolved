@@ -1,2 +1,2 @@
-git "file:///Users/jmsmith/workspace/Baseline/Gyutou" "313fc564bc8c5681f02463385e37201804bf35d4"
-github "berenjena-power/CryptoSwift" "95a8c7511fca277242fbaa66e7e7b30ddc93f49e"
+git "file:///Users/jmsmith/workspace/Baseline/Gyutou" "0.1.0"
+github "krzyzanowskim/CryptoSwift" "0.8.0"
