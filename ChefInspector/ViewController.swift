@@ -65,6 +65,7 @@ class ViewController: NSViewController {
                 self.filteredHostOutput = value
             } else {
                 self.hostOutput = ["Could not read hostname in cache": ""]
+                self.filteredHostOutput = ["Could not read hostname in cache": ""]
             }
             self.attributesOutlineView.setNeedsDisplay()
         } else {
@@ -111,15 +112,60 @@ class ViewController: NSViewController {
     }
 
     @IBAction func clearView(_ sender: NSButton) {
-        //TODO
-        //self.attributesOutlineView = empty or something
         self.hostOutput = [String:Any]()
         self.filteredHostOutput = [String:Any]()
         updateHostList()
         self.attributes = [String: Any]()
     }
 
+    func searchString(_ keyword: String, found value: Any) -> Any? {
+        if let contents = value as? [String: Any] {
+            var newFilteredOutput = [String: Any]()
+            for (key, value) in contents {
+                if key.contains(keyword) {
+                    newFilteredOutput[key] = value
+                } else {
+                    if let found = searchString(keyword, found: value) {
+                        newFilteredOutput[key] = found
+                    }
+                }
+            }
+            if newFilteredOutput.count > 0 {
+                return newFilteredOutput
+            }
+        } else if let contents = value as? [Any] {
+            var newFilteredOutput = [Any]()
+            for value in contents {
+                if let found = searchString(keyword, found: value) {
+                    newFilteredOutput.append(found)
+                }
+            }
+            if newFilteredOutput.count > 0 {
+                return newFilteredOutput
+            }
+        } else if let contents = value as? CustomStringConvertible {
+            if contents.description.contains(keyword) {
+                return contents
+            }
+        }
+        return nil
+    }
+
     @IBAction func filterHostAttribute(_ sender: NSSearchField) {
+        var expand = false
+        if let search = sender.recentSearches.first {
+            if search == "" {
+                filteredHostOutput = hostOutput
+            } else if let found = searchString(search, found: hostOutput) as? [String: Any] {
+                filteredHostOutput = found
+                expand = true
+            } else {
+                filteredHostOutput = [String:Any]()
+            }
+            self.attributesOutlineView.reloadData()
+            self.attributesOutlineView.expandItem(nil, expandChildren: expand)
+            self.attributesOutlineView.setNeedsDisplay()
+        }
     }
 
     @IBAction func hostnameSelected(_ sender: NSTableView) {
@@ -217,14 +263,14 @@ extension ViewController: NSOutlineViewDataSource {
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
         print("Counting children")
         if item == nil {
-            return self.hostOutput.keys.count
+            return filteredHostOutput.keys.count
         }
         if let node = item as? Node {
             if let list = node.children as? [Any] {
                 return list.count
             } else if let dict = node.children as? [String: Any] {
                 return dict.keys.count
-            } else if let _ = node.children as? String {
+            } else if let _ = node.children as? CustomStringConvertible {
                 return 1
             }
             //TODO(Yasumoto): Maybe we need to check [Int: Any] and others as well?
@@ -237,9 +283,9 @@ extension ViewController: NSOutlineViewDataSource {
         print("Getting item for outline")
         if item == nil {
             print("Root item, returning output")
-            let nameIndex = self.hostOutput.keys.index(self.hostOutput.keys.startIndex, offsetBy: index)
-            let name = self.hostOutput.keys[nameIndex]
-            return Node(name: name, children: self.hostOutput[name])
+            let nameIndex = filteredHostOutput.keys.index(filteredHostOutput.keys.startIndex, offsetBy: index)
+            let name = filteredHostOutput.keys[nameIndex]
+            return Node(name: name, children: filteredHostOutput[name])
         }
         if let node = item as? Node {
             if let section = node.children as? [String: Any] {
