@@ -9,16 +9,22 @@
 import Cocoa
 import Gyutou
 
+struct Node {
+    let name: String
+    let children: Any?
+}
+
 class ViewController: NSViewController {
     @IBOutlet weak var hostnameTableView: NSTableView!
 
-    @IBOutlet var attributesTextView: NSTextView!
-    let chefClient = GyutouClient()
+    @IBOutlet weak var attributesOutlineView: NSOutlineView!
+    let chefClient = try! GyutouClient()
 
     var allHostnames = [String]()
     var viewableHostnames = [String]()
-    var hostOutput = [String]()
-    var attributes = [String:String]()
+    var hostOutput = [String:Any]()
+    var filteredHostOutput = [String:Any]()
+    var attributes = [String:Any]()
     let hostQueue = DispatchQueue(label: "viewableHostsQueue")
     let chefQueue = DispatchQueue(label: "chefQueue")
 
@@ -54,20 +60,32 @@ class ViewController: NSViewController {
         //TODO(jmsmith): Next up is to use https://www.raywenderlich.com/123463/nsoutlineview-macos-tutorial for better display
         if self.attributes.index(forKey: hostname) != nil {
             print("Attributes for \(hostname) already found in cache")
-            if let value = self.attributes[hostname] {
-                self.attributesTextView.textStorage?.mutableString.setString("\(value)")
+            if let value = self.attributes[hostname] as? [String: Any] {
+                self.hostOutput = value
+                self.filteredHostOutput = value
             } else {
-                self.attributesTextView.textStorage?.mutableString.setString("Node not found in Chef.")
+                self.hostOutput = ["Could not read hostname in cache": ""]
+                self.filteredHostOutput = ["Could not read hostname in cache": ""]
             }
+            self.attributesOutlineView.setNeedsDisplay()
         } else {
             DispatchQueue.global(qos: .userInitiated).async {
                 do {
                     print("Querying chef for attributes for \(hostname)")
                     if let output = try self.chefClient.retrieveNodeAttributes(nodeName: hostname) {
-                        self.attributes[hostname] = "\(output)"
+                        self.attributes[hostname] = output
                         DispatchQueue.main.async {
                             print("Updating attributes view to display \(hostname)")
-                            self.attributesTextView.textStorage?.mutableString.setString("\(output)")
+                            if let formattedOutput = output as? [String:Any] {
+                                self.hostOutput = formattedOutput
+                                self.filteredHostOutput = self.hostOutput
+                            } else {
+                                print("Problem parsing \(output)")
+                                self.hostOutput = [String:Any]()
+                                self.filteredHostOutput = [String:Any]()
+                            }
+                            self.attributesOutlineView.reloadData()
+                            self.attributesOutlineView.setNeedsDisplay()
                         }
                     }
                 } catch {
@@ -83,6 +101,8 @@ class ViewController: NSViewController {
         updateHostList()
         hostnameTableView.delegate = self
         hostnameTableView.dataSource = self
+        attributesOutlineView.delegate = self
+        attributesOutlineView.dataSource = self
     }
 
     override var representedObject: Any? {
@@ -92,13 +112,60 @@ class ViewController: NSViewController {
     }
 
     @IBAction func clearView(_ sender: NSButton) {
-        self.attributesTextView.textStorage?.mutableString.setString("")
-        self.hostOutput = [String]()
+        self.hostOutput = [String:Any]()
+        self.filteredHostOutput = [String:Any]()
         updateHostList()
-        self.attributes = [String: String]()
+        self.attributes = [String: Any]()
+    }
+
+    func searchString(_ keyword: String, found value: Any) -> Any? {
+        if let contents = value as? [String: Any] {
+            var newFilteredOutput = [String: Any]()
+            for (key, value) in contents {
+                if key.contains(keyword) {
+                    newFilteredOutput[key] = value
+                } else {
+                    if let found = searchString(keyword, found: value) {
+                        newFilteredOutput[key] = found
+                    }
+                }
+            }
+            if newFilteredOutput.count > 0 {
+                return newFilteredOutput
+            }
+        } else if let contents = value as? [Any] {
+            var newFilteredOutput = [Any]()
+            for value in contents {
+                if let found = searchString(keyword, found: value) {
+                    newFilteredOutput.append(found)
+                }
+            }
+            if newFilteredOutput.count > 0 {
+                return newFilteredOutput
+            }
+        } else if let contents = value as? CustomStringConvertible {
+            if contents.description.contains(keyword) {
+                return contents
+            }
+        }
+        return nil
     }
 
     @IBAction func filterHostAttribute(_ sender: NSSearchField) {
+        var expand = false
+        if let search = sender.recentSearches.first {
+            if search == "" {
+                filteredHostOutput = hostOutput
+            } else if let found = searchString(search, found: hostOutput) as? [String: Any] {
+                filteredHostOutput = found
+                expand = true
+            } else {
+                filteredHostOutput = [String:Any]()
+            }
+            self.attributesOutlineView.reloadData()
+            self.attributesOutlineView.expandItem(nil, expandChildren: expand)
+            self.attributesOutlineView.setNeedsDisplay()
+        }
     }
 
     @IBAction func hostnameSelected(_ sender: NSTableView) {
@@ -120,44 +187,45 @@ class ViewController: NSViewController {
         }
         print("Reloading tableview data")
         self.hostnameTableView.reloadData()
-        chefQueue.async {
-            if sender.stringValue == "" {
+        if sender.stringValue == "" {
+            chefQueue.async {
                 print("Resetting tableview to all hostnames")
                 self.viewableHostnames = self.allHostnames
-            } else if sender.stringValue.contains(":") {
-                    do {
-                        if let searchQuery = sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-                            print("Performing chef search for \(searchQuery)")
+            }
+        } else if sender.stringValue.contains(":") {
+            chefQueue.async {
+                do {
+                    if let searchQuery = sender.stringValue.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
+                        print("Performing chef search for \(searchQuery)")
 
-                            let searchedHostnames = try self.chefClient.searchNode(query: searchQuery).sorted()
-                            self.hostQueue.sync(flags: .barrier) {
-                                self.viewableHostnames = searchedHostnames
-                            }
+                        let searchedHostnames = try self.chefClient.searchNode(query: searchQuery).sorted()
+                        self.hostQueue.sync(flags: .barrier) {
+                            self.viewableHostnames = searchedHostnames
                         }
+                    }
 
-                    } catch {
-                        print("Error searching chef: \(error)")
-                        self.viewableHostnames = []
-                    }
-            } else {
-                self.hostQueue.sync(flags: .barrier) {
-                    print("Taking a look at filtering current hostnames")
-                    let hostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }.sorted()
-                    if hostnames.count < 1 {
-                        self.viewableHostnames = [""]
-                    } else {
-                        self.viewableHostnames = hostnames
-                    }
+                } catch {
+                    print("Error searching chef: \(error)")
+                    self.viewableHostnames = []
                 }
             }
-            DispatchQueue.main.sync {
-                print("Reloading data after searching for a hostname")
-                self.hostnameTableView.reloadData()
+        } else {
+            self.hostQueue.sync(flags: .barrier) {
+                print("Taking a look at filtering current hostnames")
+                let hostnames = self.allHostnames.filter { $0.contains(sender.stringValue) }.sorted()
+                if hostnames.count < 1 {
+                    self.viewableHostnames = [""]
+                } else {
+                    self.viewableHostnames = hostnames
+                }
             }
+        }
+        DispatchQueue.main.async {
+            print("Reloading data after searching for a hostname")
+            self.hostnameTableView.reloadData()
         }
     }
 }
-
 
 extension ViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
@@ -175,7 +243,7 @@ extension ViewController: NSTableViewDelegate {
     }
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let cell = tableView.make(withIdentifier: CellIdentifiers.HostNameCell, owner: self) as? NSTableCellView {
+        if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: CellIdentifiers.HostNameCell), owner: self) as? NSTableCellView {
             return hostQueue.sync() {
                 if row < viewableHostnames.count {
                     cell.textField?.stringValue = viewableHostnames[row]
@@ -189,5 +257,87 @@ extension ViewController: NSTableViewDelegate {
         }
         return nil
     }
-    
+}
+
+extension ViewController: NSOutlineViewDataSource {
+    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
+        print("Counting children")
+        if item == nil {
+            return filteredHostOutput.keys.count
+        }
+        if let node = item as? Node {
+            if let list = node.children as? [Any] {
+                return list.count
+            } else if let dict = node.children as? [String: Any] {
+                return dict.keys.count
+            } else if let _ = node.children as? CustomStringConvertible {
+                return 1
+            }
+            //TODO(Yasumoto): Maybe we need to check [Int: Any] and others as well?
+        }
+        print("Not a leaf or section so assuming end")
+        return 0
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: Any?) -> Any {
+        print("Getting item for outline")
+        if item == nil {
+            print("Root item, returning output")
+            let nameIndex = filteredHostOutput.keys.index(filteredHostOutput.keys.startIndex, offsetBy: index)
+            let name = filteredHostOutput.keys[nameIndex]
+            return Node(name: name, children: filteredHostOutput[name])
+        }
+        if let node = item as? Node {
+            if let section = node.children as? [String: Any] {
+                let nameIndex = section.keys.index(section.keys.startIndex, offsetBy: index)
+                let name = section.keys[nameIndex]
+                return Node(name: name, children: section[name])
+            } else if let section = node.children as? [Any] {
+                let nameIndex = section.index(section.startIndex, offsetBy: index)
+                if let value = section[nameIndex] as? CustomStringConvertible {
+                    return Node(name: value.description, children: nil)
+                } //TODO(Yasumoto): Handle more than just lists of strings!
+            } else if let section = node.children as? CustomStringConvertible {
+                return Node(name: section.description, children: nil)
+            }
+        }
+        return "MISSED PARSING"
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
+        print("Checking if outline is expandable")
+        if let node = item as? Node {
+            if let _ = node.children {
+                return true
+            }
+        }
+        return false
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, objectValueFor tableColumn: NSTableColumn?, byItem item: Any?) -> Any? {
+        if let node = item as? Node {
+            print("Getting the value of \(node)")
+            return node.name
+        }
+        return "Error: Failed to get objectValue!"
+    }
+}
+
+extension ViewController: NSOutlineViewDelegate {
+    func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
+        print("Generating outline view")
+        var view: NSTableCellView?
+        var attribute = ""
+        if let attempt = item as? Node {
+            attribute = attempt.name
+        } else if let attempt = item as? CustomStringConvertible {
+            attribute = attempt.description
+        }
+        view = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "AttributeCell"), owner: self) as? NSTableCellView
+        if let textField = view?.textField {
+            textField.stringValue = attribute
+            textField.sizeToFit()
+        }
+        return view
+    }
 }
