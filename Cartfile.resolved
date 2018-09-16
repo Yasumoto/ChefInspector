@@ -1,2 +1,2 @@
-git "file:///Users/jmsmith/workspace/Baseline/Gyutou" "0.1.0"
-github "krzyzanowskim/CryptoSwift" "0.8.0"
+github "Yasumoto/Gyutou" "c3995f7989032763ba95e8b19a6eab44561a90e2"
+github "krzyzanowskim/CryptoSwift" "0.9.0"
